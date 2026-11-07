@@ -1,3 +1,5 @@
+import datetime
+
 import streamlit as st
 
 from pawpal_system import Owner, Pet, Scheduler, Task
@@ -58,19 +60,22 @@ if "pet" not in st.session_state or st.session_state.pet.name != pet_name or st.
 st.markdown("### Tasks")
 st.caption("Add a few tasks. In your final version, these should feed into your scheduler.")
 
-col1, col2, col3 = st.columns(3)
+col1, col2, col3, col4 = st.columns(4)
 with col1:
     task_title = st.text_input("Task title", value="Morning walk")
 with col2:
     duration = st.number_input("Duration (minutes)", min_value=1, max_value=240, value=20)
 with col3:
     priority = st.selectbox("Priority", ["low", "medium", "high"], index=2)
+with col4:
+    task_time = st.time_input("Task time", value=datetime.time(9, 0))
 
 if st.button("Add task"):
+    task_time_value = task_time.strftime("%H:%M")
     new_task = Task(
         title=task_title,
         description=f"{task_title} for {st.session_state.pet.name}",
-        time="09:00",
+        time=task_time_value,
         duration=int(duration),
         priority=priority,
         frequency="Daily",
@@ -103,10 +108,45 @@ st.caption("This button should call your scheduling logic once you implement it.
 
 if st.button("Generate schedule"):
     scheduler = Scheduler()
-    schedule = scheduler.generate_daily_plan(st.session_state.owner, 240)
+    all_tasks = st.session_state.owner.get_all_tasks()
+    sorted_tasks = scheduler.sort_tasks(all_tasks)
+    incomplete_tasks = scheduler.filter_by_status(all_tasks, False)
+    conflict_warning = scheduler.detect_conflicts(all_tasks)
 
-    if schedule is None:
-        st.warning("The scheduler is not implemented yet, so no schedule was generated.")
-    else:
+    if sorted_tasks:
         st.success("Generated schedule:")
-        st.write(schedule)
+        st.table(
+            [
+                {
+                    "time": task.time,
+                    "title": task.title,
+                    "pet": task.pet.name if hasattr(task, "pet") and task.pet is not None else "Unknown",
+                    "priority": task.priority,
+                    "duration": task.duration,
+                    "completed": task.completed,
+                }
+                for task in sorted_tasks
+            ]
+        )
+    else:
+        st.info("No tasks available for the schedule yet.")
+
+    if incomplete_tasks:
+        st.subheader("Incomplete tasks")
+        st.table(
+            [
+                {
+                    "time": task.time,
+                    "title": task.title,
+                    "pet": task.pet.name if hasattr(task, "pet") and task.pet is not None else "Unknown",
+                    "priority": task.priority,
+                    "duration": task.duration,
+                }
+                for task in incomplete_tasks
+            ]
+        )
+
+    if conflict_warning:
+        st.warning(conflict_warning)
+    else:
+        st.success("No scheduling conflicts detected.")
