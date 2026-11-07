@@ -1,0 +1,46 @@
+classDiagram
+    class Owner {
+        +String name
+        +String preferences
+        +List~Pet~ pets
+        +add_pet(pet)
+        +get_all_tasks()
+    }
+
+    class Pet {
+        +String name
+        +String species
+        +List~Task~ tasks
+        +add_task(task)
+    }
+
+    class Task {
+        +String title
+        +String description
+        +String time
+        +int duration
+        +String priority
+        +String frequency
+        +bool completed
+        +String next_due_date
+        +Pet pet
+        +mark_complete()
+    }
+
+    class Scheduler {
+        +generate_daily_plan(owner, available_time) <<stub>>
+        +_time_to_minutes(time_value)
+        +sort_tasks(tasks)
+        +filter_tasks(tasks, available_time)
+        +filter_by_status(tasks, completed)
+        +filter_by_pet(owner_or_pets, pet_name)
+        +detect_conflicts(tasks)
+        +explain_plan(tasks)
+    }
+
+    Owner "1" --> "*" Pet : owns
+    Pet "1" --> "*" Task : has
+    Task --> Pet : belongs to
+    Scheduler ..> Owner : reads owner data
+    Scheduler ..> Pet : filters tasks by pet
+    Scheduler ..> Task : sorts, filters, and checks conflicts
