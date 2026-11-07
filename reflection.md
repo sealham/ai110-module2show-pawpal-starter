@@ -3,14 +3,19 @@
 ## 1. System Design
 
 **a. Initial design**
+My initial UML design consists of four main classes: Owner, Pet, Task, and Scheduler. The goal is to give each class a specific responsibility so the application can organize pet care information and generate daily schedules.
 
-- Briefly describe your initial UML design.
-- What classes did you include, and what responsibilities did you assign to each?
+- **Owner:** Stores the owner's basic information and manages their pets.
+
+- **Pet:** Stores information about each pet and keeps track of its care tasks.
+
+- **Task:** Represents an individual pet care activity, including its description, time, frequency, duration, priority, and completion status.
+
+- **Scheduler:** Retrieves tasks from the owner's pets and organizes them into a daily plan based on constraints such as time, priority, and preferences.
 
 **b. Design changes**
 
-- Did your design change during implementation?
-- If yes, describe at least one change and why you made it.
+The initial design was mostly preserved because the core responsibilities of Owner, Pet, Task, and Scheduler still matched the system's goals. However, I added a scheduled `time` attribute to the Task class so each task could be placed into a daily schedule in chronological order. This was necessary because the scheduler needs to know when a task should occur in addition to its description, priority, and duration, allowing it to organize activities more realistically and avoid conflicting or poorly sequenced care routines.
 
 ---
 
