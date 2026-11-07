@@ -236,3 +236,93 @@ def test_detect_conflicts_no_conflict_returns_none():
     warning = Scheduler().detect_conflicts(pet.tasks)
 
     assert warning is None
+
+
+def test_sort_tasks_orders_by_time_ascending():
+    task_a = Task(
+        title="Dinner",
+        description="Evening meal",
+        time="18:00",
+        duration=30,
+        priority="Medium",
+        frequency="Daily",
+    )
+    task_b = Task(
+        title="Breakfast",
+        description="Morning meal",
+        time="07:30",
+        duration=15,
+        priority="High",
+        frequency="Daily",
+    )
+    task_c = Task(
+        title="Lunch",
+        description="Midday meal",
+        time="12:00",
+        duration=20,
+        priority="Medium",
+        frequency="Daily",
+    )
+
+    ordered = Scheduler().sort_tasks([task_a, task_b, task_c])
+
+    assert ordered == [task_b, task_c, task_a]
+
+
+def test_filter_by_status_returns_only_matching_tasks():
+    task_done = Task(
+        title="Completed task",
+        description="Already done",
+        time="08:00",
+        duration=10,
+        priority="Low",
+        frequency="Daily",
+    )
+    task_done.mark_complete()
+    task_open = Task(
+        title="Open task",
+        description="Needs attention",
+        time="09:00",
+        duration=20,
+        priority="High",
+        frequency="Daily",
+    )
+
+    complete_tasks = Scheduler().filter_by_status([task_done, task_open], True)
+    open_tasks = Scheduler().filter_by_status([task_done, task_open], False)
+
+    assert complete_tasks == [task_done]
+    assert open_tasks == [task_open]
+
+
+def test_filter_by_pet_returns_only_that_pet_tasks():
+    owner = Owner(name="Alex", preferences={"preferred_time": "morning"})
+    dog = Pet(name="Bella", species="Dog")
+    cat = Pet(name="Milo", species="Cat")
+
+    dog_task = Task(
+        title="Walk Bella",
+        description="30-minute walk",
+        time="08:00",
+        duration=30,
+        priority="High",
+        frequency="Daily",
+    )
+    cat_task = Task(
+        title="Feed Milo",
+        description="Breakfast",
+        time="07:30",
+        duration=10,
+        priority="High",
+        frequency="Daily",
+    )
+
+    dog.add_task(dog_task)
+    cat.add_task(cat_task)
+    owner.add_pet(dog)
+    owner.add_pet(cat)
+
+    filtered = Scheduler().filter_by_pet(owner, "Bella")
+
+    assert filtered == [dog_task]
+    assert all(task.pet.name == "Bella" for task in filtered)
