@@ -28,8 +28,7 @@ The initial design was mostly preserved because the core responsibilities of Own
 
 **b. Tradeoffs**
 
-- Describe one tradeoff your scheduler makes.
-- Why is that tradeoff reasonable for this scenario?
+One tradeoff in our scheduler is that it detects conflicts only when tasks share the exact same start time, rather than when two tasks overlap in duration. This keeps the logic simple and easy to read, which is helpful in a prototype where the main goal is to flag obvious scheduling problems early. It also makes the warning messages clearer and easier to explain to the user. The limitation is that two tasks with different start times could still overlap in practice, so this approach does not catch every possible conflict, only the most direct ones.
 
 ---
 

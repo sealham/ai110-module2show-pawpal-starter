@@ -69,14 +69,12 @@ Sample test output:
 
 ## 📐 Smarter Scheduling
 
-> Fill in once you've implemented scheduling logic.
-
 | Feature | Method(s) | Notes |
 |---------|-----------|-------|
-| Task sorting | | e.g., by priority, duration |
-| Filtering | | e.g., skip tasks if time runs out |
-| Conflict handling | | e.g., overlapping time slots |
-| Recurring tasks | | e.g., daily vs. weekly |
+| Task sorting | `Scheduler.sort_tasks()` | Sorts tasks chronologically by converting each task's `time` value from `HH:MM` into minutes since midnight. This keeps the schedule in a reliable time order without depending on raw string sorting. |
+| Filtering | `Scheduler.filter_by_status()`, `Scheduler.filter_by_pet()` | `filter_by_status()` returns only completed or incomplete tasks depending on the boolean passed in. `filter_by_pet()` returns the tasks for a specific pet by name, using the pet-to-task relationship already stored in the data model. Example: `filter_by_status(tasks, False)` shows only open tasks; `filter_by_pet(owner, "Bella")` returns Bella's tasks. |
+| Conflict handling | `Scheduler.detect_conflicts()` | Checks all tasks for identical scheduled start times and returns a warning message rather than raising an exception. It includes the affected pet names and task titles in the message, so it catches conflicts within the same pet and across different pets. |
+| Recurring tasks | `Task.mark_complete()` | When a task is marked complete and its `frequency` is `Daily` or `Weekly`, a new task is created for the next day or next week while keeping the original task completed. The next occurrence keeps the same title, description, time, duration, priority, and frequency, and is automatically added to the owning pet's `tasks` list if it does not already exist. |
 
 ## 📸 Demo Walkthrough
 
